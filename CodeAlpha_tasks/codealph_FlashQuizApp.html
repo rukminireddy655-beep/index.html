@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcard Quiz App</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        block-size: 100vh;
+        margin: 0;
+    }
+
+    .app {
+        background: white;
+        inline-size: 400px;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .card {
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        min-block-size: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 18px;
+    }
+
+    button {
+        padding: 8px 12px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background: #4CAF50;
+        color: white;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    .secondary {
+        background: #2196F3;
+    }
+
+    .danger {
+        background: #f44336;
+    }
+
+    input, textarea {
+        inline-size: 95%;
+        padding: 5px;
+        margin: 5px 0;
+    }
+</style>
+</head>
+<body>
+
+<div class="app">
+    <h2>Flashcard Quiz</h2>
+
+    <div class="card" id="cardContent">
+        No flashcards available
+    </div>
+
+    <button onclick="showAnswer()">Show Answer</button><br>
+    <button class="secondary" onclick="prevCard()">Previous</button>
+    <button class="secondary" onclick="nextCard()">Next</button><br>
+
+    <button onclick="toggleAddForm()">Add Card</button>
+    <button onclick="editCard()">Edit</button>
+    <button class="danger" onclick="deleteCard()">Delete</button>
+
+    <div id="formContainer" style="display:none;">
+        <h3 id="formTitle">Add Flashcard</h3>
+        <input type="text" id="questionInput" placeholder="Enter question">
+        <textarea id="answerInput" placeholder="Enter answer"></textarea>
+        <button onclick="saveCard()">Save</button>
+    </div>
+</div>
+
+<script>
+let flashcards = [
+    { question: "What is HTML?", answer: "HTML stands for HyperText Markup Language." },
+    { question: "What is CSS?", answer: "CSS stands for Cascading Style Sheets." }
+];
+
+let currentIndex = 0;
+let showingAnswer = false;
+let editing = false;
+
+function displayCard() {
+    const card = document.getElementById("cardContent");
+    if (flashcards.length === 0) {
+        card.innerText = "No flashcards available";
+        return;
+    }
+    card.innerText = showingAnswer 
+        ? flashcards[currentIndex].answer 
+        : flashcards[currentIndex].question;
+}
+
+function showAnswer() {
+    if (flashcards.length === 0) return;
+    showingAnswer = !showingAnswer;
+    displayCard();
+}
+
+function nextCard() {
+    if (flashcards.length === 0) return;
+    currentIndex = (currentIndex + 1) % flashcards.length;
+    showingAnswer = false;
+    displayCard();
+}
+
+function prevCard() {
+    if (flashcards.length === 0) return;
+    currentIndex = (currentIndex - 1 + flashcards.length) % flashcards.length;
+    showingAnswer = false;
+    displayCard();
+}
+
+function toggleAddForm() {
+    editing = false;
+    document.getElementById("formTitle").innerText = "Add Flashcard";
+    document.getElementById("questionInput").value = "";
+    document.getElementById("answerInput").value = "";
+    document.getElementById("formContainer").style.display = "block";
+}
+
+function editCard() {
+    if (flashcards.length === 0) return;
+    editing = true;
+    document.getElementById("formTitle").innerText = "Edit Flashcard";
+    document.getElementById("questionInput").value = flashcards[currentIndex].question;
+    document.getElementById("answerInput").value = flashcards[currentIndex].answer;
+    document.getElementById("formContainer").style.display = "block";
+}
+
+function saveCard() {
+    const question = document.getElementById("questionInput").value.trim();
+    const answer = document.getElementById("answerInput").value.trim();
+
+    if (!question || !answer) {
+        alert("Please fill in both fields.");
+        return;
+    }
+
+    if (editing) {
+        flashcards[currentIndex] = { question, answer };
+    } else {
+        flashcards.push({ question, answer });
+        currentIndex = flashcards.length - 1;
+    }
+
+    document.getElementById("formContainer").style.display = "none";
+    showingAnswer = false;
+    displayCard();
+}
+
+function deleteCard() {
+    if (flashcards.length === 0) return;
+
+    flashcards.splice(currentIndex, 1);
+
+    if (currentIndex >= flashcards.length) {
+        currentIndex = flashcards.length - 1;
+    }
+
+    showingAnswer = false;
+    displayCard();
+}
+
+displayCard();
+</script>
+
+</body>
+</html>
